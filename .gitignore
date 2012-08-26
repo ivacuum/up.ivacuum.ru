@@ -34,4 +34,5 @@ nbproject
 .CVS
 .idea
 
-cache/templates
+/cache
+/config.php
