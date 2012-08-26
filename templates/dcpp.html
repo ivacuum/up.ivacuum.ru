@@ -1,0 +1,78 @@
+<!-- include page_header.html -->
+
+<h1>{L_UPLOAD_DCPP_CLIENTS}</h1>
+<div id="extra_content">
+	<h3>{L_DOWNLOADED_TODAY}</h3>
+	<p>{TODAY_DLC}</p>
+	<h3>{L_TOTAL_DOWNLOADS}</h3>
+	<p>{TOTAL_DLC}</p>
+	<h3>{L_SIZE_OF_ALL_FILES}</h3>
+	<p>{TOTAL_SIZE}</p>
+	<h3>{L_BANDWIDTH_USED}</h3>
+	<p>{TOTAL_TRAFFIC}</p>
+	<h3>{L_LINKS}</h3>
+	<ul class="list">
+		<li><a href="{U_STATS_DOWNLOADS}">{L_DETAIL_STATISTICS}</a></li>
+		<li><a href="{U_STATS_REALTIME}">{L_REALTIME}</a></li>
+	</ul>
+</div>
+<div id="main_content">
+	<div id="content_reducer">
+		<form action="{U_ACTION}" enctype="multipart/form-data" id="upload" method="post">
+		<h3>{L_FILE}</h3>
+		<p><img src="{P_IMAGES}/_/document_zipper.png" alt="" />&nbsp;&nbsp;<input type="file" name="userfile" id="userfile" size="44" /></p>
+		<h3>{L_UPLOAD_OPTIONS}</h3>
+		<table width="500">
+			<tr>
+				<td><label for="file_name">{L_CLIENT_TITLE}:</label></td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td><input type="text" name="file_name" style="width: 99%;" value="{FILE_NAME}" id="file_name" /></td>
+			</tr>
+			<tr>
+				<td><label for="file_url">URL:</label></td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td><input type="text" name="file_url" style="width: 99%;" value="{FILE_URL}" id="file_url" /></td>
+			</tr>
+		</table>
+		<p>
+			<button id="button_upload">{L_UPLOAD}</button>
+			<input type="submit" name="submit" id="submit_client" value="Загрузить" class="hidden" />
+		</p>
+		</form>
+		<h3>{L_RESTRICTIONS}</h3>
+		<ul class="list">
+			<li>{L_FILE_FORMAT}: <b>dmg</b>, <b>exe</b>, <b>msi</b>, <b>zip</b>;</li>
+			<li>{L_FILE_SIZE}: {L_UP_TO} <b>40 {L_SIZE_MB}</b>.</li>
+		</ul>
+	</div>
+</div>
+
+<script type="text/javascript">
+/*function highlight_query(source)
+{
+	$('.ui-menu-item a').html($('.ui-menu-item a').html().replace($('#' + source).val(), '<b>' + $('#' + source).val() + '</b>'));
+}*/
+
+$(document).ready(function() {
+	$('#file_name').autocomplete({
+		source: '{U_DCPP_FILE_NAME}',
+		minLength: 2
+	});
+
+	$('#file_url').autocomplete({
+		source: '{U_DCPP_FILE_URL}',
+		minLength: 2
+	});
+
+	$('#button_upload').button({
+		icons: {
+			primary: 'ui-icon-drive-upload'
+		}
+	}).click(function(e) {
+		e.preventDefault();
+		$('#submit_client').click();
+	});
+});
+</script>
+
+<!-- include page_footer.html -->

@@ -1,0 +1,13 @@
+{% spaceless %}
+<ul class="breadcrumb ui-shadow-extralight">
+	<li><a href="{{ U_INDEX }}">{{ lang.INDEX_PAGE }}</a></li>
+	{% for row in nav_links %}
+		<span class="divider">&rarr;</span>
+		{% if not loop.last %}
+			<a href="{{ row.URL }}">{{ row.TEXT }}</a>
+		{% else %}
+			<span>{{ row.TEXT }}</span>
+		{% endif %}
+	{% endfor %}
+</ul>
+{% endspaceless %}

@@ -1,0 +1,26 @@
+{% extends "images_base.html" %}
+
+{% block content %}
+<h2>{{ page.page_title }}</h2>
+
+<table class="table-stats ui-shadow-light">
+	<thead>
+	<tr>
+		<th class="number">#</th>
+		<th>Пользователь</th>
+		<th class="number">Просмотров <img src="{{ static('i', '_/arrow_270') }}" alt=""></th>
+		<th class="number">Изображений</th>
+		<th class="number">Размер</th>
+	</tr>
+	</thead>
+	{% for row in users %}
+		<tr>
+			<td class="number">{{ loop.index }}</td>
+			<td><b>{{ row.PROFILE }}</b></td>
+			<td class="number">{{ row.VIEWS }}</td>
+			<td class="number">{{ row.IMAGES }}</td>
+			<td class="number">{{ row.SIZE }}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock %}

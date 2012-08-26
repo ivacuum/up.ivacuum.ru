@@ -1,0 +1,194 @@
+<!-- include page_header.html -->
+
+<h1>{L_UPLOAD_IMAGES_TO_GALLERY}</h1>
+<div id="extra_content">
+	<p class="sub_navigation" id="addLinks">
+		<span class="item"><span class="pseudo_link" id="addNewLink" onclick="addMultiUpload(1);">{L_ADD_1_FILE}</span></span>
+		<span class="item"><span class="pseudo_link" id="addNewLink5" onclick="addMultiUpload(5);">{L_ADD_5_FILES}</span></span>
+		<span class="item"><span class="pseudo_link" id="addNewLink10" onclick="addMultiUpload(10);">{L_ADD_10_FILES}</span></span>
+	</p>
+	<h3>{L_UPLOADED_TODAY}</h3>
+	<p>{TODAY_IMAGES}</p>
+	<h3>{L_TOTAL_IMAGES}</h3>
+	<p>{TOTAL_IMAGES}</p>
+	<h3>{L_TOTAL_IMAGES_VIEWS}</h3>
+	<p>{IMAGE_VIEWS}</p>
+	<h3>{L_TOTAL_IMAGES_SIZE}</h3>
+	<p>{TOTAL_SIZE}</p>
+	<h3>{L_BANDWIDTH_USED}</h3>
+	<p>{TOTAL_TRAFFIC}</p>
+	<h3>{L_LINKS}</h3>
+	<ul class="list">
+		<li><a href="{U_STATS_GALLERY}">{L_DETAIL_STATISTICS}</a></li>
+		<li><a href="{U_STATS_REFERERS}">{L_IMAGES_REFERERS}</a></li>
+	</ul>
+</div>
+<div id="main_content">
+	<div id="content_reducer">
+		<form action="{U_ACTION}" enctype="multipart/form-data" id="upload" method="post">
+		<h3>{L_FILELIST}</h3>
+		<table>
+			<tr>
+				<td align="center"><img src="{P_IMAGES}/_/image_plus.png" alt="" />&nbsp;&nbsp;<input type="file" name="userfile[]" id="userfile" size="44" min="1" max="10" multiple="true" /><div id="files_container"></div></td>
+			</tr>
+		</table>
+		<ul class="list" id="multiple_tip">
+			<li>{L_CAN_CHOOSE_UP_TO_10_FILES}</li>
+		</ul>
+		<h3>{L_UPLOAD_OPTIONS}</h3>
+		<table>
+			<tr>
+				<td>{L_SCALE}:</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>
+					<select name="resize_to">
+						<option value="0">---</option>
+						<option value="640">640x480</option>
+						<option value="800">800x600</option>
+						<option value="1024">1024x768</option>
+						<option value="1280">1280x1024</option>
+						<option value="1600">1600x1200</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>{L_CREATE_THUMBNAIL}:</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>
+					<select name="preview_size">
+						<option value="0">---</option>
+						<option value="180">180</option>
+						<option value="360">360</option>
+					</select>
+					px
+				</td>
+			</tr>
+			<tr>
+				<td>{L_THUMBNAIL_QUALITY}:</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>85 %</td>
+			</tr>
+			<tr>
+				<td>{L_ADD_TO_ALBUM}:</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>
+					<select name="album">
+						<option value="0">---</option>
+						<!-- cycle image_albums -->
+						<option value="{image_albums.ID}">{image_albums.TITLE}</option>
+						<!-- endcycle image_albums -->
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>{L_ADD_WATERMARK}:</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>
+					<select name="watermark">
+						<option value="0">---</option>
+						<option value="torrent">torrent.ivacuum.ru</option>
+					</select>
+					<select name="watermark_pos">
+						<option value="southeast">{L_POSITION_SOUTHEAST}</option>
+						<option value="south">{L_POSITION_SOUTH}</option>
+						<option value="southwest">{L_POSITION_SOUTHWEST}</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<p>
+			<button id="button_upload">{L_UPLOAD}</button>
+			<input type="submit" name="submit" id="submit_images" value="Загрузить" class="hidden" />
+		</p>
+		<input type="hidden" name="mode" value="images" />
+		</form>
+		<h3>{L_RESTRICTIONS}</h3>
+		<ul class="list">
+			<li>{L_FILE_FORMAT}: <b>gif</b>, <b>jpg</b>, <b>png</b>;</li>
+			<li>{L_WIDTH} x {L_HEIGHT}: {L_UP_TO} <b>3000x3000</b> ({L_IN_CASE_OF_SCALING} &mdash; {L_UP_TO} <b>6000x6000</b>);</li>
+			<li>{L_SIZE_OF_EACH_FILE}: {L_UP_TO} <b>4 {L_SIZE_MB}</b>;</li>
+			<li>{L_MULTIUPLOAD_WORKS_IN} <b>Mozilla Firefox 3.6+</b>, <b>Safari 4+</b>, <b>Chrome 4+</b>, <b>Opera 9+</b>.</li>
+		</ul>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function() {
+	var ff_old = false;
+
+	if( $.browser.mozilla ) {
+		var ff_version_major = parseFloat($.browser.version);
+
+		if( ff_version_major >= 1.9 && ff_version_major < 2 ) {
+			var ff_version_minor = parseFloat($.browser.version.substr(4));
+
+			if( ff_version_minor < 2 ) {
+				ff_old = true;
+			}
+		} else if( ff_version_major < 1.9 ) {
+			ff_old = true;
+		}
+	}
+
+	if( $.browser.msie || ff_old ) {
+		$('#addLinks').show();
+		$('#multiple_tip').hide();
+		$('#userfile').remove();
+		$('#files_container').before('<input type="file" name="userfile" id="userfile" size="44" />');
+	} else {
+		$('#addLinks').remove();
+	}
+
+	$('#button_upload').button({
+		icons: {
+			primary: 'ui-icon-drive-upload'
+		}
+	}).click(function(e) {
+		e.preventDefault();
+		$('#submit_images').click();
+	});
+});
+
+top.fileUploadAttr = 'file';
+top.maxUpload = 9;
+
+addNewUpload = function(link) {
+  var advSelectors = document.getElementById('files_container');
+  chkAvailability(advSelectors, top.maxUpload);
+
+  if( advSelectors.childNodes.length >= top.maxUpload ) {
+    return;
+  }
+
+  var file_id = advSelectors.childNodes.length;
+
+  $('#files_container').append('<div id="filediv' + file_id + '" style="display: none; padding: 7px 0 0;"><img src="{P_IMAGES}/_/minus.png" alt="" style="cursor: pointer;" id="filedel' + file_id + '" />&nbsp;&nbsp;<input id="file' + file_id + '" type="file" size="44" name="userfile' + file_id + '" /></div>');
+  $('#filediv' + file_id).fadeIn();
+
+  $('#filedel' + file_id).click(function() {
+    $('#filediv' + file_id).remove();
+    chkAvailability(advSelectors, top.maxUpload);
+  });
+
+  chkAvailability(advSelectors, top.maxUpload);
+}
+
+function addMultiUpload(num) {
+  var link = document.getElementById('addNewLink');
+  while( num-- > 0 ) {
+    addNewUpload(link);
+  }
+}
+
+function chkAvailability(obj, limit) {
+  var links = document.getElementById('addLinks');
+  var link = document.getElementById('addNewLink');
+  var link5 = document.getElementById('addNewLink5');
+  var link10 = document.getElementById('addNewLink10');
+  links.style.display = obj.childNodes.length >= limit ? 'none' : '';
+  link5.style.display = obj.childNodes.length > limit - 4 ? 'none' : '';
+  link10.style.display = obj.childNodes.length > limit - 9 ? 'none' : '';
+}
+</script>
+
+<!-- include page_footer.html -->

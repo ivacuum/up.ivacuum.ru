@@ -1,0 +1,36 @@
+{% extends "images_base.html" %}
+
+{% block content %}
+<h2>{{ page.page_title }}</h2>
+
+<div class="row">
+	<div class="span2">
+		<h4>В локальной сети</h4>
+		<p><img src="{{ static('i', '_/network_ethernet') }}" alt=""> {{ LOCAL_VIEWS }}</p>
+	</div>
+	<div class="span2">
+		<h4>В сети интернет</h4>
+		<p><img src="{{ static('i', '_/globe_green') }}" alt=""> {{ INTERNET_VIEWS }}</p>
+</p>
+	</div>
+</div>
+
+<br>
+
+<table class="table-stats ui-shadow-light">
+	<thead>
+	<tr>
+		<th class="number">#</th>
+		<th>Домен</th>
+		<th class="number">Просмотров <img src="{{ static('i', '_/arrow_270') }}" alt=""></th>
+	</tr>
+	</thead>
+	{% for row in ref %}
+		<tr>
+			<td class="number">{{ loop.index }}</td>
+			<td><a href="http://{{ row.DOMAIN }}">{{ row.DOMAIN }}</a> <img src="{{ static('i', '_/external') }}" alt=""></td>
+			<td class="number">{{ row.VIEWS }}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock %}

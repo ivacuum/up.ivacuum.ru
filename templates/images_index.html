@@ -1,0 +1,295 @@
+{% extends "images_base.html" %}
+
+{% block content %}
+<div class="page-header">
+	<h2>{{ page.page_title }}</h2>
+</div>
+
+<div id="alerts_container"></div>
+
+<div id="form_container">
+<form action="{{ U_ACTION }}" enctype="multipart/form-data" id="upload" method="post" class="form-horizontal">
+<fieldset>
+	<div class="control-group">
+		<label class="control-label" for="userfile">{{ lang.FILELIST }}</label>
+		<div class="controls">
+			<img src="{{ static('i', '_/image_plus') }}" alt="">&nbsp;&nbsp;<input type="file" name="userfile[]" id="userfile" min="1" max="10" multiple="true" class="span6">
+			<span class="help-block">{{ lang.CAN_CHOOSE_UP_TO_10_FILES }}</span>
+		</div>
+	</div>
+</fieldset>
+<fieldset>
+	<legend>{{ lang.UPLOAD_OPTIONS }}</legend>
+	<div class="control-group">
+		<label class="control-label" for="resize_to">{{ lang.SCALE }}</label>
+		<div class="controls">
+			<select name="resize_to" id="resize_to">
+				<option value="0">---</option>
+				<option value="640">640x480</option>
+				<option value="800">800x600</option>
+				<option value="1024">1024x768</option>
+				<option value="1280">1280x1024</option>
+				<option value="1600">1600x1200</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="preview_size">{{ lang.CREATE_THUMBNAIL }}</label>
+		<div class="controls">
+			<select name="preview_size" id="preview_size">
+				<option value="0">---</option>
+				<option value="180">180 px</option>
+				<option value="360">360 px</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="watermark">{{ lang.WATERMARK }}</label>
+		<div class="controls">
+			<select name="watermark" id="watermark">
+				<option value="0">---</option>
+				<option value="torrent">torrent.ivacuum.ru</option>
+			</select>
+			<select name="watermark_pos" id="watermark_pos">
+				<option value="southeast">{{ lang.POSITION_SOUTHEAST }}</option>
+				<option value="south">{{ lang.POSITION_SOUTH }}</option>
+				<option value="southwest">{{ lang.POSITION_SOUTHWEST }}</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-actions">
+		<input type="submit" class="btn btn-large btn-primary span3" id="submit_images" value="{{ lang.UPLOAD }}">
+	</div>
+</fieldset>
+</form>
+
+<div style="display: none;">
+	<div class="page-header">
+		<h2>Выбранные файлы</h2>
+	</div>
+	<ul class="thumbnails" id="thumbnails_container"></ul>
+</div>
+
+<div class="page-header">
+	<h2>{{ lang.RESTRICTIONS }}</h2>
+</div>
+<ul>
+	<li>{{ lang.FILE_FORMAT }}: <b>gif</b>, <b>jpg</b>, <b>png</b>;</li>
+	<li>{{ lang.WIDTH }} x {{ lang.HEIGHT }}: {{ lang.UP_TO }} <b>3000x3000</b> ({{ lang.IN_CASE_OF_SCALING }} &mdash; {{ lang.UP_TO }} <b>6000x6000</b>);</li>
+	<li>{{ lang.SIZE_OF_EACH_FILE }}: {{ lang.UP_TO }} <b>4 {{ lang.SIZE_MB }}</b>;</li>
+</ul>
+</div>
+
+<div id="links_container"></div>
+
+<div class="modal fade" id="upload_progress_container" style="display: none;">
+	<div class="modal-header">
+		<h3>Идёт загрузка файлов</h3>
+	</div>
+	<div class="modal-body">
+		<table class="table-stats" style="width: 100%;">
+			<thead>
+				<th class="number" style="width: 25px;">#</th>
+				<th>Файл</th>
+				<th style="width: 150px;">Загрузка</th>
+			</thead>
+			<tbody id="files_container"></tbody>
+		</table>
+	</div>
+	<div class="modal-footer"></div>
+</div>
+
+<script type="text/javascript">
+var files_count        = 0;
+var files_not_uploaded = 0;
+var queue              = [];
+var upload_err         = '';
+var uploaded_files     = [];
+
+$(document).ready(function() {
+	/* Проверка поддержки File API */
+	if( window.File == null || window.FileList == null || window.FileReader == null ) {
+		return false;
+	}
+	
+	if( $.browser.opera && $.browser.version >= 12 ) {
+		return false;
+	}
+	
+	$('#submit_images').bind('click', function() {
+		if( window.FormData == null ) {
+			return true;
+		}
+		
+		if( files_count < 1 ) {
+			$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Необходимо выбрать хотя бы один файл.</div>');
+			return false;
+		}
+		
+		if( files_count > 15 ) {
+			$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>В данный момент нельзя выбирать более 15 файлов.</div>');
+			return false;
+		}
+		
+		$('#upload_progress_container').modal({
+			backdrop: 'static',
+			show: true
+		});
+		
+		return false;
+	});
+	
+	$('#upload_progress_container').bind('shown', function() {
+		$('#form_container').hide();
+		setTimeout(function() { do_upload(0); }, 1000);
+	});
+	
+	$('#userfile').bind('change', function() {
+		process_files(this.files);
+	});
+	
+	function do_upload(index)
+	{
+		var file     = queue[index];
+		var form     = new FormData();
+		var xhr      = new XMLHttpRequest();
+		var progress = '0%';
+		var uploaded = false;
+		
+		form.append('userfile[]', file);
+		
+		xhr.upload.addEventListener('progress', function(e) {
+			if( e.lengthComputable ) {
+				progress = parseInt((e.loaded * 100) / e.total) + '%';
+				$('#fileprogressfill' + index).css('width', progress);
+				$('#fileprogresstext' + index).html(progress);
+			}
+		}, false);
+
+		xhr.upload.addEventListener('load', function() {
+			progress = '100%';
+			$('#fileprogressfill' + index).css('width', progress);
+			$('#fileprogresstext' + index).html(progress);
+			uploaded = true;
+		}, false);
+		
+		xhr.onreadystatechange = function() {
+			if( this.readyState == 4 ) {
+				if( this.status == 200 ) {
+					if( uploaded ) {
+						/* Загрузка завершена */
+						var response = $.parseJSON(this.responseText);
+						
+						files_not_uploaded += response.files_not_uploaded;
+						
+						for( var i = 0; i < response.files.length; i++ ) {
+							var pic = response.files[i];
+							
+							if( pic.errors_count > 0 ) {
+								upload_err += '<h4>' + pic.uploadname + '</h4><ul>';
+								
+								for( var j = 0; j < pic.errors_count; j++ ) {
+									upload_err += '<li>' + pic.errors[i] + '</li>';
+								}
+								
+								upload_err += '</ul>';
+							} else {
+								$('#links_container').append(response.html);
+							}
+						}
+						
+						if( index + 1 < files_count ) {
+							setTimeout(function() { do_upload(index + 1); }, 500);
+						} else {
+							if( files_not_uploaded > 0 ) {
+								$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: ' + files_not_uploaded + '.<br>' + upload_err + '</div>');
+							}
+							
+							if( files_count - files_not_uploaded > 0 ) {
+								$('#links_container').prepend('<h3>Индивидуальные ссылки</h3>');
+							}
+							
+							if( files_count - files_not_uploaded > 1 ) {
+								var images_links         = '',
+								    images_links_tagged  = '',
+								    images_links_preview = '';
+							
+								$('#links_container input[ref="image_link"]').each(function() {
+									images_links += $(this).val() + '&#10;';
+								});
+							
+								$('#links_container input[ref="image_link_tagged"]').each(function() {
+									images_links_tagged += $(this).val() + ' ';
+								});
+							
+								$('#links_container input[ref="image_link_preview"]').each(function() {
+									images_links_preview += $(this).val() + ' ';
+								})
+							
+								$('#links_container').prepend('<h3>Ссылки на все картинки</h3><p>Ссылка:<br><textarea class="span9" style="height: ' + ((files_count - files_not_uploaded) * 20) + 'px;">' + images_links.substr(0, images_links.length - 5) + '</textarea><br>Полная картинка:<br><input type="text" class="span9" value="' + images_links_tagged + '">' + ((images_links_preview) ? '<br>Превью - увеличение по клику:<br><input type="text" class="span9" value="' + images_links_preview + '">' : '') + '</p>');
+							}
+							
+							$('#links_container input[type=text], #links_container textarea').bind('click', function() {
+								highlight(this);
+							});
+
+							setTimeout(function() { $('#upload_progress_container').modal('hide'); }, 500);
+						}
+					}
+				}
+			}
+		};
+		
+		xhr.open('POST', '{{ U_ACTION }}?preview_size=' + $('#preview_size').val() + '&resize_to=' + $('#resize_to').val() + '&watermark=' + $('#watermark').val() + '&watermark_pos=' + $('#watermark_pos').val());
+		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		xhr.send(form);
+	}
+	
+	function process_files(files)
+	{
+		$('#alerts_container').empty();
+		$('#files_container').empty();
+		$('#thumbnails_container').empty();
+		files_count = 0;
+		queue = [];
+		
+		$.each(files, function(i, file) {
+			if( !file.type.match(/image\/.*/) ) {
+				$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Файл <b>' + file.name + '</b> не подходит по типу. Вероятно, это не картинка.</div>');
+				return true;
+			}
+			
+			if( file.size > 4194304 ) {
+				$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Файл <b>' + file.name + '</b> не подходит по размеру. Он превышает 4 МБ.</div>');
+				return true;
+			}
+			
+			/* Индикаторы загрузки */
+			$('#files_container').append('<tr id="userfile' + files_count + '"><td class="number">' + (files_count + 1) + '.</td><td>' + file.name.substr(0, 38) + '</td><td class="number"><div class="prog-bar blue"><div class="progress-int"><div class="progress-fill" id="fileprogressfill' + files_count + '" style="width: 0%;"></div><div class="progress-int-text" id="fileprogresstext' + files_count + '">0%</div></div></div></td></tr>');
+			
+			/* Предпросмотр */
+			var reader = new FileReader();
+			
+			reader.onload = (function() {
+				return function(e) {
+					$('#thumbnails_container').append('<li class="span3"><a class="thumbnail"><img src="' + e.target.result + '" alt=""></a></li>');
+				};
+			})();
+			
+			reader.readAsDataURL(file);
+			
+			queue[files_count] = file;
+			files_count++;
+		});
+		
+		$('#thumbnails_container').parent().slideDown('slow');
+	}
+	
+	/* Подсветка полей со ссылками */
+	function highlight(field) {
+	  field.focus();
+	  field.select();
+	}
+});
+</script>
+{% endblock %}
