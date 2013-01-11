@@ -1,9 +1,7 @@
 <?php
 /**
-*
 * @package up.ivacuum.ru
 * @copyright (c) 2011
-*
 */
 
 namespace app\models;
