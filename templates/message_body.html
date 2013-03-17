@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{extends "base.html"}
 
-{% block breadcrumbs %}{% endblock %}
-{% block content %}
+{block "breadcrumbs"}{/block}
+{block "content"}
 <div class="hero-unit">
-	<h2>{{ MESSAGE_TITLE }}</h2>
-	<p>{{ MESSAGE_TEXT }}</p>
+	<h2>{$MESSAGE_TITLE}</h2>
+	<p>{$MESSAGE_TEXT}</p>
 </div>
-{% endblock %}
+{/block}

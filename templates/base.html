@@ -1,24 +1,37 @@
-{% spaceless %}
+{strip}
 <!DOCTYPE html>
-<html dir="{{ S_LANGUAGE_DIRECTION }}" lang="{{ S_LANGUAGE }}">
+<html dir="{$S_LANGUAGE_DIRECTION}" lang="{$S_LANGUAGE}">
 <head>
-<meta charset="utf-8">
-<title>{% for row in nav_links %}{{ row.TEXT }}{% if not loop.last %} &raquo; {% else %}. {% endif %}{% endfor %}{{ cfg.sitename }}</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="copyright" content="{{ S_YEAR }} vacuum">
-{% if page.page_noindex %}
-	<meta name="robots" content="noindex, nofollow">
-{% endif %}
-<meta name="keywords" content="{{ page.page_keywords }}">
-<meta name="description" content="{{ page.page_description }}">
-{{ META }}
-<link rel="shortcut icon" href="{{ static('i', '_/drive_upload') }}">
-<link rel="stylesheet" href="{{ static('i', 'bootstrap/' ~ cfg.bootstrap_version ~ '/style', 'css') }}">
-<link rel="stylesheet" href="{{ static('i', 'bootstrap/' ~ cfg.bootstrap_version ~ '/expansion.css?mtime=' ~ S_STYLE_MTIME, '') }}">
+	<meta charset="utf-8">
+	<title>{foreach $breadcrumbs|default:[] as $row}{$row.TEXT}{if not $row@last} &raquo; {else}. {/if}{/foreach}{$cfg.sitename}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="copyright" content="{$smarty.now|date_format:'%Y'} vacuum">
+	{if $page.page_noindex}
+		<meta name="robots" content="noindex, nofollow">
+	{/if}
+	<meta name="keywords" content="{$page.page_keywords|default:''}">
+	<meta name="description" content="{$page.page_description|default:''}">
+	{$META|default:''}
+	{if $S_ISP == 'local'}
+		<link rel="shortcut icon" href="//0.ivacuum.org/i/_/drive_upload.png">
+		<link rel="stylesheet" href="//0.ivacuum.org/i/bootstrap/2.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//0.ivacuum.org/i/bootstrap/2.3.1/css/bootstrap-responsive.min.css">
+		<link rel="stylesheet" href="//0.ivacuum.org/i/bootstrap/2.3.1/expansion.css">
 
-<script>var g_local = {% if S_ISP == 'local' %}true{% else %}false{% endif %};</script>
-<script src="{{ static('js', 'jquery/' ~ cfg.jquery_version ~ '/jquery.min') }}"></script>
-<script src="{{ static('i', 'bootstrap/' ~ cfg.bootstrap_version ~ '/plugins.js?mtime=' ~ S_MAIN_JS_MTIME, '') }}"></script>
+		<script>var g_local = true;</script>
+		<script src="//0.ivacuum.org/js/jquery/1.9.1/jquery.min.js"></script>
+		<script src="//0.ivacuum.org/i/bootstrap/2.3.1/js/bootstrap.min.js"></script>
+		<script src="//0.ivacuum.org/js/base-1.9.1.js"></script>
+	{else}
+		<link rel="shortcut icon" href="//ivacuum.org/i/_/drive_upload.png">
+		<link rel="stylesheet" href="//yandex.st/bootstrap/2.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//yandex.st/bootstrap/2.3.1/css/bootstrap-responsive.min.css">
+		<link rel="stylesheet" href="//ivacuum.org/i/bootstrap/2.3.1/expansion.css">
+
+		<script src="//yandex.st/jquery/1.9.1/jquery.min.js"></script>
+		<script src="//yandex.st/bootstrap/2.3.1/js/bootstrap.min.js"></script>
+		<script src="//ivacuum.org/js/base-1.9.1.js"></script>
+	{/if}
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -29,64 +42,69 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</a>
-			<a class="brand" href="{{ U_INDEX }}">{{ cfg.sitename }}</a>
+			<a class="brand" href="{$U_INDEX}">{$cfg.sitename}{if $S_ISP == 'local'} <sup>local</sup>{/if}</a>
 			<div class="nav-collapse">
 				<ul class="nav">
-				{% for row in menu %}
-					{% if row.children %}
-						<li class="dropdown{% if row.ACTIVE %} active{% endif %}"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ row.TITLE }} <b class="caret"></b></a>
+				{foreach $menu as $row}
+					{if $row.children}
+						<li class="dropdown{if isset($row.ACTIVE)} active{/if}"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{$row.TITLE} <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-							{% for row in row.children %}
-								<li><a href="{{ row.URL }}">{{ row.TITLE }}</a></li>
-							{% endfor %}
+							{foreach $row.children as $row2}
+								<li><a href="{$row2.URL}">{$row2.TITLE}</a></li>
+							{/foreach}
 							</ul>
 						</li>
-					{% else %}
-						<li{% if row.ACTIVE %} class="active"{% endif %}><a href="{{ row.URL }}">{{ row.TITLE }}</a></li>
-					{% endif %}
-				{% endfor %}
+					{else}
+						<li class="{if isset($row.ACTIVE)}active{/if}"><a href="{$row.URL}">{$row.TITLE}</a></li>
+					{/if}
+				{/foreach}
 				</ul>
-				{% if S_USER_REGISTERED %}
+				{if $S_USER_REGISTERED}
 					<ul class="nav pull-right">
-						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="{{ S_OPENID_PROVIDER ? static('i', 'openid/' ~ S_OPENID_PROVIDER) : static('i', '_/user_guest_question') }}" alt=""> {{ S_USERNAME }} <b class="caret"></b></a>
+						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="//ivacuum.org/i/{($S_OPENID_PROVIDER) ? 'openid/$S_OPENID_PROVIDER' : '_/user_guest_question'}.png" alt=""> {$S_USERNAME} <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li><a href="//ivacuum.ru/">&larr; ivacuum.ru</a></li>
+								<li><a href="//ivacuum.ru/{$S_LANGUAGE}/">&larr; ivacuum.ru</a></li>
 								<li><a href="//t.ivacuum.ru/">&larr; torrent.ivacuum.ru</a></li>
 								<li class="divider"></li>
-								<li><a href="//ivacuum.ru/ucp/logout.html?goto={{ U_THIS_PAGE }}">{{ lang.SIGNOUT }}</a></li>
+								<li><a href="{$U_SIGNOUT}?goto={$U_THIS_PAGE}">{'SIGNOUT'|i18n}</a></li>
 							</ul>
 						</li>
-						{#
-						{% if languages %}
-							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="{{ static('flag16', S_LANGUAGE) }}" alt="">&nbsp;<b class="caret"></b></a>
+						{*
+						{if $languages}
+							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="//ivacuum.org/i/flags/16/{$S_LANGUAGE}.png" alt="">&nbsp;<b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									{% for row in languages %}
-										<li><a href="{{ row.URL }}"><img src="{{ static('flag16', row.IMG) }}" alt=""> &nbsp;{{ row.NAME }}</a></li>
-									{% endfor %}
+									{foreach $languages as $row}
+										<li><a href="{$row.URL}"><img src="//ivacuum.org/i/flags/16/{$row.IMG}.png" alt=""> &nbsp;{$row.NAME}</a></li>
+									{/foreach}
 								</ul>
 							</li>
-						{% endif %}
-						#}
+						{/if}
+						*}
 					</ul>
-				{% endif %}
+				{/if}
 			</div>
 		</div>
 	</div>
 </div>
 <div class="container">
-	{% endspaceless %}
-	{% block content_header %}{% endblock %}
-	{% block content %}{% endblock %}
-	{% block content_footer %}{% endblock %}
-	{% spaceless %}
+	{/strip}
+	{block "content_header"}{/block}
+	{block "content"}{/block}
+	{block "content_footer"}{/block}
+	{strip}
 	<footer>
-		<p class="pull-right"><a href="mailto:{{ cfg.email_support }}">Обратная связь</a></p>
-		<p>&copy; {{ S_YEAR }} vacuum</p>
+		<ul class="inline">
+			<li class="muted">&copy; {$smarty.now|date_format:'%Y'} vacuum</li>
+			<li class="muted">&middot;</li>
+			<li><a href="mailto:{$cfg.email_support}">{'FEEDBACK'|i18n}</a></li>
+		</ul>
 	</footer>
 </div>
-{% if S_ISP == 'internet' %}
+{if $S_ISP == 'internet'}
+{literal}
 <!-- Yandex.Metrika counter --><div style="display:none;"><script type="text/javascript">(function(w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter10489303 = new Ya.Metrika({id:10489303, clickmap:true, accurateTrackBounce:true, webvisor:true}); } catch(e) { } }); })(window, "yandex_metrika_callbacks");</script></div><script src="//mc.yandex.ru/metrika/watch.js" type="text/javascript" defer="defer"></script><noscript><div><img src="//mc.yandex.ru/watch/10489303" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
-{% endif %}
+{/literal}
+{/if}
 </body>
 </html>
-{% endspaceless %}
+{/strip}

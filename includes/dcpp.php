@@ -56,16 +56,12 @@ class dcpp extends page
 		$total_size    = $row['total_size'];
 		$total_traffic = $row['total_traffic'];
 
-		$template->vars(array(
-			'TODAY_DLC'     => num_format($today_dlc),
-			'TOTAL_DLC'     => num_format($total_dlc),
-			'TOTAL_SIZE'    => humn_size($total_size),
-			'TOTAL_TRAFFIC' => humn_size($total_traffic),
-
-			'U_ACTION'          => ilink('?mode=dcpp'),
-			'U_STATS_DOWNLOADS' => ilink(sprintf('%s/%s.html', $user->lang['URL_STATS'], $user->lang['URL_STATS_DOWNLOADS']), '//ivacuum.ru'),
-			'U_STATS_REALTIME'  => ilink(sprintf('%s/%s.html?action=realtime', $user->lang['URL_STATS'], $user->lang['URL_STATS_DOWNLOADS']), '//ivacuum.ru'))
-		);
+		$template->vars([
+			'TODAY_DLC'     => $today_dlc,
+			'TOTAL_DLC'     => $total_dlc,
+			'TOTAL_SIZE'    => $total_size,
+			'TOTAL_TRAFFIC' => $total_traffic,
+		]);
 
 		page_header('Загрузка клиентов DC++');
 
@@ -146,7 +142,7 @@ class dcpp extends page
 				/**
 				* Обрабатываем только загруженные без ошибок файлы
 				*/
-				$upload = new \fileupload('', array('dmg', 'exe', 'msi', 'zip'), 41943040);
+				$upload = new \fileupload('', ['dmg', 'exe', 'msi', 'zip'], 41943040);
 				$file = $upload->form_upload('userfile');
 				$file->clean_filename('defined', $file_url);
 				$file->move_file('static.ivacuum.ru/d/dc/clients', true, true);
@@ -158,7 +154,7 @@ class dcpp extends page
 				}
 				else
 				{
-					$sql_ary = array(
+					$sql_ary = [
 						'file_project'   => 'dc',
 						'file_folder'    => 'clients',
 						'file_time'      => $user->ctime,
@@ -166,7 +162,7 @@ class dcpp extends page
 						'file_url'       => $file_url,
 						'file_size'      => $file->filesize,
 						'file_extension' => $file->extension
-					);
+					];
 
 					/**
 					* Заносим информацию о загруженном изображении в БД

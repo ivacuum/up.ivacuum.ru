@@ -1,21 +1,12 @@
 <?php
 /**
 * @package up.ivacuum.ru
-* @copyright (c) 2011
+* @copyright (c) 2013
 */
 
 namespace app;
 
-require('/srv/www/vhosts/src/bootstrap.php');
-
-/**
-* Создание сессии
-* Инициализация привилегий
-*/
-$user->session_begin();
-$auth->init($user->data);
-$user->setup();
+require('../../_/fw/1.2.0/bootstrap.php');
 
 /* Маршрутизация запроса */
-$router = new \engine\core\router();
-$router->handle_request();
+$app['router']->_init()->handle_request();

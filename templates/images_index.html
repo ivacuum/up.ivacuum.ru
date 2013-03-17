@@ -1,27 +1,27 @@
-{% extends "images_base.html" %}
+{extends "images_base.html"}
 
-{% block content %}
+{block "content"}
 <div class="page-header">
-	<h2>{{ page.page_title }}</h2>
+	<h2>{$page.page_title}</h2>
 </div>
 
 <div id="alerts_container"></div>
 
 <div id="form_container">
-<form action="{{ U_ACTION }}" enctype="multipart/form-data" id="upload" method="post" class="form-horizontal">
+<form action="{'index'|url_for}" enctype="multipart/form-data" id="upload" method="post" class="form-horizontal">
 <fieldset>
 	<div class="control-group">
-		<label class="control-label" for="userfile">{{ lang.FILELIST }}</label>
+		<label class="control-label" for="userfile">{'FILELIST'|i18n}</label>
 		<div class="controls">
-			<img src="{{ static('i', '_/image_plus') }}" alt="">&nbsp;&nbsp;<input type="file" name="userfile[]" id="userfile" min="1" max="10" multiple="true" class="span6">
-			<span class="help-block">{{ lang.CAN_CHOOSE_UP_TO_10_FILES }}</span>
+			<img src="//ivacuum.org/i/_/image_plus.png" alt="">&nbsp;&nbsp;<input type="file" name="userfile[]" id="userfile" min="1" max="10" multiple="true" class="span6">
+			<span class="help-block">{'CAN_CHOOSE_UP_TO_10_FILES'|i18n}</span>
 		</div>
 	</div>
 </fieldset>
 <fieldset>
-	<legend>{{ lang.UPLOAD_OPTIONS }}</legend>
+	<legend>{'UPLOAD_OPTIONS'|i18n}</legend>
 	<div class="control-group">
-		<label class="control-label" for="resize_to">{{ lang.SCALE }}</label>
+		<label class="control-label" for="resize_to">{'SCALE'|i18n}</label>
 		<div class="controls">
 			<select name="resize_to" id="resize_to">
 				<option value="0">---</option>
@@ -34,7 +34,7 @@
 		</div>
 	</div>
 	<div class="control-group">
-		<label class="control-label" for="preview_size">{{ lang.CREATE_THUMBNAIL }}</label>
+		<label class="control-label" for="preview_size">{'CREATE_THUMBNAIL'|i18n}</label>
 		<div class="controls">
 			<select name="preview_size" id="preview_size">
 				<option value="0">---</option>
@@ -44,21 +44,21 @@
 		</div>
 	</div>
 	<div class="control-group">
-		<label class="control-label" for="watermark">{{ lang.WATERMARK }}</label>
+		<label class="control-label" for="watermark">{'WATERMARK'|i18n}</label>
 		<div class="controls">
 			<select name="watermark" id="watermark">
 				<option value="0">---</option>
 				<option value="torrent">torrent.ivacuum.ru</option>
 			</select>
 			<select name="watermark_pos" id="watermark_pos">
-				<option value="southeast">{{ lang.POSITION_SOUTHEAST }}</option>
-				<option value="south">{{ lang.POSITION_SOUTH }}</option>
-				<option value="southwest">{{ lang.POSITION_SOUTHWEST }}</option>
+				<option value="southeast">{'POSITION_SOUTHEAST'|i18n}</option>
+				<option value="south">{'POSITION_SOUTH'|i18n}</option>
+				<option value="southwest">{'POSITION_SOUTHWEST'|i18n}</option>
 			</select>
 		</div>
 	</div>
 	<div class="form-actions">
-		<input type="submit" class="btn btn-large btn-primary span3" id="submit_images" value="{{ lang.UPLOAD }}">
+		<input type="submit" class="btn btn-large btn-primary span3" id="submit_images" value="{'UPLOAD'|i18n}">
 	</div>
 </fieldset>
 </form>
@@ -71,12 +71,12 @@
 </div>
 
 <div class="page-header">
-	<h2>{{ lang.RESTRICTIONS }}</h2>
+	<h2>{'RESTRICTIONS'|i18n}</h2>
 </div>
 <ul>
-	<li>{{ lang.FILE_FORMAT }}: <b>gif</b>, <b>jpg</b>, <b>png</b>;</li>
-	<li>{{ lang.WIDTH }} x {{ lang.HEIGHT }}: {{ lang.UP_TO }} <b>3000x3000</b> ({{ lang.IN_CASE_OF_SCALING }} &mdash; {{ lang.UP_TO }} <b>6000x6000</b>);</li>
-	<li>{{ lang.SIZE_OF_EACH_FILE }}: {{ lang.UP_TO }} <b>4 {{ lang.SIZE_MB }}</b>;</li>
+	<li>{'FILE_FORMAT'|i18n}: <b>gif</b>, <b>jpg</b>, <b>png</b>;</li>
+	<li>{'WIDTH'|i18n} x {'HEIGHT'|i18n}: {'UP_TO'|i18n} <b>3000x3000</b> ({'IN_CASE_OF_SCALING'|i18n} &mdash; {'UP_TO'|i18n} <b>6000x6000</b>);</li>
+	<li>{'SIZE_OF_EACH_FILE'|i18n}: {'UP_TO'|i18n} <b>4 {'SIZE_MB'|i18n}</b>;</li>
 </ul>
 </div>
 
@@ -99,34 +99,34 @@
 	<div class="modal-footer"></div>
 </div>
 
-<script type="text/javascript">
-var files_count        = 0;
-var files_not_uploaded = 0;
-var queue              = [];
-var upload_err         = '';
-var uploaded_files     = [];
+<script>
+var files_count        = 0,
+    files_not_uploaded = 0,
+    queue              = [],
+    upload_err         = '',
+    uploaded_files     = [];
 
 $(document).ready(function() {
 	/* Проверка поддержки File API */
-	if( window.File == null || window.FileList == null || window.FileReader == null ) {
+	if (window.File == null || window.FileList == null || window.FileReader == null) {
 		return false;
 	}
 	
-	if( $.browser.opera && $.browser.version >= 12 ) {
+	if ($.browser.opera && $.browser.version >= 12) {
 		return false;
 	}
 	
 	$('#submit_images').bind('click', function() {
-		if( window.FormData == null ) {
+		if (window.FormData == null) {
 			return true;
 		}
 		
-		if( files_count < 1 ) {
+		if (files_count < 1) {
 			$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Необходимо выбрать хотя бы один файл.</div>');
 			return false;
 		}
 		
-		if( files_count > 15 ) {
+		if (files_count > 15) {
 			$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>В данный момент нельзя выбирать более 15 файлов.</div>');
 			return false;
 		}
@@ -148,18 +148,17 @@ $(document).ready(function() {
 		process_files(this.files);
 	});
 	
-	function do_upload(index)
-	{
-		var file     = queue[index];
-		var form     = new FormData();
-		var xhr      = new XMLHttpRequest();
-		var progress = '0%';
-		var uploaded = false;
+	function do_upload(index) {
+		var file     = queue[index],
+		    form     = new FormData(),
+		    xhr      = new XMLHttpRequest(),
+		    progress = '0%',
+		    uploaded = false;
 		
 		form.append('userfile[]', file);
 		
 		xhr.upload.addEventListener('progress', function(e) {
-			if( e.lengthComputable ) {
+			if (e.lengthComputable) {
 				progress = parseInt((e.loaded * 100) / e.total) + '%';
 				$('#fileprogressfill' + index).css('width', progress);
 				$('#fileprogresstext' + index).html(progress);
@@ -174,21 +173,21 @@ $(document).ready(function() {
 		}, false);
 		
 		xhr.onreadystatechange = function() {
-			if( this.readyState == 4 ) {
-				if( this.status == 200 ) {
-					if( uploaded ) {
+			if (this.readyState == 4) {
+				if (this.status == 200) {
+					if (uploaded) {
 						/* Загрузка завершена */
 						var response = $.parseJSON(this.responseText);
 						
 						files_not_uploaded += response.files_not_uploaded;
 						
-						for( var i = 0; i < response.files.length; i++ ) {
+						for (var i = 0; i < response.files.length; i++) {
 							var pic = response.files[i];
 							
-							if( pic.errors_count > 0 ) {
+							if (pic.errors_count > 0) {
 								upload_err += '<h4>' + pic.uploadname + '</h4><ul>';
 								
-								for( var j = 0; j < pic.errors_count; j++ ) {
+								for (var j = 0; j < pic.errors_count; j++) {
 									upload_err += '<li>' + pic.errors[i] + '</li>';
 								}
 								
@@ -198,18 +197,18 @@ $(document).ready(function() {
 							}
 						}
 						
-						if( index + 1 < files_count ) {
+						if (index + 1 < files_count) {
 							setTimeout(function() { do_upload(index + 1); }, 500);
 						} else {
-							if( files_not_uploaded > 0 ) {
+							if (files_not_uploaded > 0) {
 								$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: ' + files_not_uploaded + '.<br>' + upload_err + '</div>');
 							}
 							
-							if( files_count - files_not_uploaded > 0 ) {
+							if (files_count - files_not_uploaded > 0) {
 								$('#links_container').prepend('<h3>Индивидуальные ссылки</h3>');
 							}
 							
-							if( files_count - files_not_uploaded > 1 ) {
+							if (files_count - files_not_uploaded > 1) {
 								var images_links         = '',
 								    images_links_tagged  = '',
 								    images_links_preview = '';
@@ -240,13 +239,12 @@ $(document).ready(function() {
 			}
 		};
 		
-		xhr.open('POST', '{{ U_ACTION }}?preview_size=' + $('#preview_size').val() + '&resize_to=' + $('#resize_to').val() + '&watermark=' + $('#watermark').val() + '&watermark_pos=' + $('#watermark_pos').val());
+		xhr.open('POST', '{'index'|url_for}?preview_size=' + $('#preview_size').val() + '&resize_to=' + $('#resize_to').val() + '&watermark=' + $('#watermark').val() + '&watermark_pos=' + $('#watermark_pos').val());
 		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 		xhr.send(form);
 	}
 	
-	function process_files(files)
-	{
+	function process_files(files) {
 		$('#alerts_container').empty();
 		$('#files_container').empty();
 		$('#thumbnails_container').empty();
@@ -254,12 +252,12 @@ $(document).ready(function() {
 		queue = [];
 		
 		$.each(files, function(i, file) {
-			if( !file.type.match(/image\/.*/) ) {
+			if (!file.type.match(/image\/.*/)) {
 				$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Файл <b>' + file.name + '</b> не подходит по типу. Вероятно, это не картинка.</div>');
 				return true;
 			}
 			
-			if( file.size > 4194304 ) {
+			if (file.size > 4194304) {
 				$('#alerts_container').append('<div class="alert" data-dismiss="alert"><a class="close" href="#">&times;</a>Файл <b>' + file.name + '</b> не подходит по размеру. Он превышает 4 МБ.</div>');
 				return true;
 			}
@@ -284,12 +282,6 @@ $(document).ready(function() {
 		
 		$('#thumbnails_container').parent().slideDown('slow');
 	}
-	
-	/* Подсветка полей со ссылками */
-	function highlight(field) {
-	  field.focus();
-	  field.select();
-	}
 });
 </script>
-{% endblock %}
+{/block}

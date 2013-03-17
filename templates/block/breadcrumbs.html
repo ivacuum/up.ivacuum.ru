@@ -1,13 +1,11 @@
-{% spaceless %}
-<ul class="breadcrumb ui-shadow-extralight">
-	<li><a href="{{ U_INDEX }}">{{ lang.INDEX_PAGE }}</a></li>
-	{% for row in nav_links %}
-		<span class="divider">&rarr;</span>
-		{% if not loop.last %}
-			<a href="{{ row.URL }}">{{ row.TEXT }}</a>
-		{% else %}
-			<span>{{ row.TEXT }}</span>
-		{% endif %}
-	{% endfor %}
+<ul class="breadcrumb">
+	<li><a href="{$U_INDEX}">{'INDEX_PAGE'|i18n}</a></li>
+	{foreach $breadcrumbs|default:[] as $row}
+		{if not $row@last}
+			<li><span class="divider">&rarr;</span><a href="{$row.URL}">{$row.TEXT}</a></li>
+		{else}
+			<li class="active"><span class="divider">&rarr;</span>{$row.TEXT}</li>
+		{/if}
+		</li>
+	{/foreach}
 </ul>
-{% endspaceless %}

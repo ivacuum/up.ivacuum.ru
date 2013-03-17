@@ -1,17 +1,16 @@
-{% extends "images_base.html" %}
+{extends "images_base.html"}
 
-{% block content %}
-<h2>{{ page.page_title }}</h2>
+{block "content"}
+<h2>{$page.page_title}</h2>
 
 <div class="row">
 	<div class="span2">
 		<h4>В локальной сети</h4>
-		<p><img src="{{ static('i', '_/network_ethernet') }}" alt=""> {{ LOCAL_VIEWS }}</p>
+		<p><img src="//ivacuum.org/i/_/network_ethernet.png" alt=""> {$LOCAL_VIEWS|number_format}</p>
 	</div>
 	<div class="span2">
 		<h4>В сети интернет</h4>
-		<p><img src="{{ static('i', '_/globe_green') }}" alt=""> {{ INTERNET_VIEWS }}</p>
-</p>
+		<p><img src="//ivacuum.org/i/_/globe_green.png" alt=""> {$INTERNET_VIEWS|number_format}</p>
 	</div>
 </div>
 
@@ -22,15 +21,15 @@
 	<tr>
 		<th class="number">#</th>
 		<th>Домен</th>
-		<th class="number">Просмотров <img src="{{ static('i', '_/arrow_270') }}" alt=""></th>
+		<th class="number">Просмотров <img src="//ivacuum.org/i/_/arrow_270.png" alt=""></th>
 	</tr>
 	</thead>
-	{% for row in ref %}
+	{foreach $referers as $row}
 		<tr>
-			<td class="number">{{ loop.index }}</td>
-			<td><a href="http://{{ row.DOMAIN }}">{{ row.DOMAIN }}</a> <img src="{{ static('i', '_/external') }}" alt=""></td>
-			<td class="number">{{ row.VIEWS }}</td>
+			<td class="number">{$row@iteration}</td>
+			<td><a href="http://{$row.DOMAIN}">{$row.DOMAIN}</a> <img src="//ivacuum.org/i/_/external.png" alt=""></td>
+			<td class="number">{$row.VIEWS|number_format}</td>
 		</tr>
-	{% endfor %}
+	{/foreach}
 </table>
-{% endblock %}
+{/block}

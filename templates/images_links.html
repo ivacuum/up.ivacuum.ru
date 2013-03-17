@@ -1,74 +1,70 @@
-{% extends "images_base.html" %}
+{extends "images_base.html"}
 
-{% block content %}
+{block "content"}
 <div class="page-header">
-	<h2>{{ page.page_title }}</h2>
+	<h2>{$page.page_title}</h2>
 </div>
 
-{% if upload_errors %}
+{if $upload_errors}
 	<div class="alert-message" data-alert="alert">
 		<a class="close" href="#">&times;</a>
-		<p><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: {{ FILES_NOT_UPLOADED }}.</p>
+		<p><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: {$FILES_NOT_UPLOADED}.</p>
 		<br>
-		{% for row in upload_errors if row.ERRORS %}
-			<h4>{{ row.FILE }}</h4>
-			<ul>
-				{% for row in row.ERRORS %}
-					<li>{{ row }}</li>
-				{% endfor %}
-			</ul>
-		{% endfor %}
+		{foreach $upload_errors as $row}
+			{if not empty($row.ERRORS)}
+				<h4>{$row.FILE}</h4>
+				<ul>
+					{foreach $row.ERRORS as $row}
+						<li>{$row}</li>
+					{/foreach}
+				</ul>
+			{/if}
+		{/foreach}
 	</div>
-{% endif %}
+{/if}
 
 <div id="links_container">
-{% if FILES_UPLOADED >= 1 %}
-	{% if FILES_UPLOADED >= 2 %}
+{if $FILES_UPLOADED >= 1}
+	{if $FILES_UPLOADED >= 2}
 		<h3>Ссылки на все картинки</h3>
 		<p>
 			Ссылка:
-			<br><textarea class="span9" style="height: {{ FILES_UPLOADED * 20 }}px;">{% for row in files %}http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+			<br><textarea class="span9" style="height: {$FILES_UPLOADED * 20}px;">{foreach $files as $row}http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}{if not $row@last}&#10;{/if}{/foreach}</textarea>
 			<br>Полная картинка:
-			<br><input type="text" class="span9" value="{% for row in files %}[img]http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}[/img] {% endfor %}">
-			{% if THUMB %}
+			<br><input type="text" class="span9" value="{foreach $files as $row}[img]http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}[/img] {/foreach}">
+			{if $THUMB}
 				<br>Превью - увеличение по клику:
-				<br><input type="text" class="span9" value="{% for row in files %}[url=http://ivacuum.ru/галерея/просмотр/{{ row.ID }}.html][img]http://img.ivacuum.ru/g/{{ row.DATE }}/s/{{ row.REALNAME }}[/img][/url] {% endfor %}">
-			{% endif %}
+				<br><input type="text" class="span9" value="{foreach $files as $row}[url=http://ivacuum.ru/галерея/просмотр/{$row.ID}.html][img]http://img.ivacuum.ru/g/{$row.DATE}/s/{$row.REALNAME}[/img][/url] {/foreach}">
+			{/if}
 		</p>
-	{% endif %}
+	{/if}
 	
 	<h3>Индивидуальные ссылки</h3>
-	{% for row in files %}
+	{foreach $files as $row}
 		<div class="row">
 			<div class="span2">
-				<div class="thumbnail"><img src="{{ cfg.gallery_path }}/{{ row.DATE }}/t/{{ row.REALNAME }}" alt=""></div>
+				<div class="thumbnail"><img src="{$cfg.gallery_path}/{$row.DATE}/t/{$row.REALNAME}" alt=""></div>
 			</div>
 			<div class="span7"><p>
 				Ссылка:
-				<br><input type="text" class="span7" value="http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}">
+				<br><input type="text" class="span7" value="http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}">
 				<br>Полная картинка:
-				<br><input type="text" class="span7" value="[img]http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}[/img]">
-				{% if THUMB %}
+				<br><input type="text" class="span7" value="[img]http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}[/img]">
+				{if $THUMB}
 					<br>Превью - увеличение по клику:
-					<br><input type="text" class="span7" value="[url=http://ivacuum.ru/галерея/просмотр/{{ row.ID }}.html][img]http://img.ivacuum.ru/g/{{ row.DATE }}/s/{{ row.REALNAME }}[/img][/url]">
-				{% endif %}
+					<br><input type="text" class="span7" value="[url=http://ivacuum.ru/галерея/просмотр/{$row.ID}.html][img]http://img.ivacuum.ru/g/{$row.DATE}/s/{$row.REALNAME}[/img][/url]">
+				{/if}
 			</p></div>
 		</div>
-	{% endfor %}
-{% endif %}
+	{/foreach}
+{/if}
 </div>
 
-<script type="text/javascript">
+<script>
 $(document).ready(function() {
 	$('#links_container input[type=text], #links_container textarea').bind('click', function() {
 		highlight(this);
 	});
 });
-
-/* Подсветка полей со ссылками */
-function highlight(field) {
-  field.focus();
-  field.select();
-}
 </script>
-{% endblock %}
+{/block}

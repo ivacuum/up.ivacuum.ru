@@ -1,17 +1,17 @@
-{% for row in files %}
+{foreach $files as $row}
 	<div class="row">
 		<div class="span2">
-			<div class="thumbnail"><img src="{{ cfg.gallery_path }}/{{ row.DATE }}/t/{{ row.REALNAME }}" alt=""></div>
+			<div class="thumbnail"><img src="{$cfg.gallery_path}/{$row.DATE}/t/{$row.REALNAME}" alt=""></div>
 		</div>
 		<div class="span7"><p>
 			Ссылка:
-			<br><input type="text" class="span7" ref="image_link" value="http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}">
+			<br><input type="text" class="span7" ref="image_link" value="http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}">
 			<br>Полная картинка:
-			<br><input type="text" class="span7" ref="image_link_tagged" value="[img]http://img.ivacuum.ru/g/{{ row.DATE }}/{{ row.REALNAME }}[/img]">
-			{% if THUMB %}
+			<br><input type="text" class="span7" ref="image_link_tagged" value="[img]http://img.ivacuum.ru/g/{$row.DATE}/{$row.REALNAME}[/img]">
+			{if $THUMB}
 				<br>Превью - увеличение по клику:
-				<br><input type="text" class="span7" ref="image_link_preview" value="[url=http://ivacuum.ru/галерея/просмотр/{{ row.ID }}.html][img]http://img.ivacuum.ru/g/{{ row.DATE }}/s/{{ row.REALNAME }}[/img][/url]">
-			{% endif %}
+				<br><input type="text" class="span7" ref="image_link_preview" value="[url=http://ivacuum.ru/галерея/просмотр/{$row.ID}.html][img]http://img.ivacuum.ru/g/{$row.DATE}/s/{$row.REALNAME}[/img][/url]">
+			{/if}
 		</p></div>
 	</div>
-{% endfor %}
+{/foreach}
