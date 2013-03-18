@@ -11,14 +11,15 @@
 		<p><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: {$FILES_NOT_UPLOADED}.</p>
 		<br>
 		{foreach $upload_errors as $row}
-			{if not empty($row.ERRORS)}
-				<h4>{$row.FILE}</h4>
-				<ul>
-					{foreach $row.ERRORS as $row}
-						<li>{$row}</li>
-					{/foreach}
-				</ul>
+			{if empty($row.ERRORS)}
+				{continue}
 			{/if}
+			<h4>{$row.FILE}</h4>
+			<ul>
+				{foreach $row.ERRORS as $row2}
+					<li>{$row2}</li>
+				{/foreach}
+			</ul>
 		{/foreach}
 	</div>
 {/if}
