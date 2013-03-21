@@ -6,7 +6,7 @@
 
 namespace app;
 
-require('../../_/fw/1.2.0/bootstrap.php');
+require('../../_/fw/1.2.1/bootstrap.php');
 
 /* Маршрутизация запроса */
 $app['router']->_init()->handle_request();
