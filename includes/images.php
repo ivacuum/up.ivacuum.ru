@@ -53,17 +53,17 @@ class images extends page
 		$files_uploaded = $files_not_uploaded = 0;
 		$date = date('y/m/d');
 		
-		// $this->config['images_upload_dir'] = '/srv/www/vhosts/static.ivacuum.ru/tmp/';
+		// $this->config['gallery.images.upload_dir'] = '/srv/www/vhosts/static.ivacuum.ru/tmp/';
 
-		if (!is_dir("{$this->config['images_upload_dir']}{$date}/"))
+		if (!is_dir("{$this->config['gallery.images.upload_dir']}{$date}/"))
 		{
 			/**
 			* Изображения храним по дням
 			* Если папки с текущей датой нету, то создаём её
 			*/
-			mkdir("{$this->config['images_upload_dir']}{$date}/", 0777, true);
-			mkdir("{$this->config['images_upload_dir']}{$date}/t/", 0777);
-			mkdir("{$this->config['images_upload_dir']}{$date}/s/", 0777);
+			mkdir("{$this->config['gallery.images.upload_dir']}{$date}/", 0777, true);
+			mkdir("{$this->config['gallery.images.upload_dir']}{$date}/t/", 0777);
+			mkdir("{$this->config['gallery.images.upload_dir']}{$date}/s/", 0777);
 		}
 
 		if (isset($_FILES['userfile']['name']) && sizeof($_FILES['userfile']['name']) > 10)
@@ -148,7 +148,7 @@ class images extends page
 			$upload = new \fw\upload\fileupload(['gif', 'jpg', 'jpeg', 'png'], 4194304, 0, 0, 3000, 3000);
 			$file = $upload->form_upload($files);
 			$file->clean_filename('unique_ext', "{$this->user['user_id']}_");
-			$file->move_file($this->config['images_upload_dir'] . $date, false, false);
+			$file->move_file($this->config['gallery.images.upload_dir'] . $date, false, false);
 
 			if (sizeof($file->error))
 			{
