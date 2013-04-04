@@ -1,4 +1,4 @@
-{foreach $files as $row}
+{foreach $files|default:[] as $row}
 	<div class="row">
 		<div class="span2">
 			<div class="thumbnail"><img src="//img.ivacuum.ru/g/{$row.DATE}/t/{$row.REALNAME}" alt=""></div>
