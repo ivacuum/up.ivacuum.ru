@@ -24,7 +24,7 @@ class service extends base_service
 				SELECT
 					COUNT(*) as today_images
 				FROM
-					' . IMAGES_TABLE . '
+					site_images
 				WHERE
 					image_time >= UNIX_TIMESTAMP(CURRENT_DATE())';
 			$this->db->query($sql);
@@ -40,7 +40,7 @@ class service extends base_service
 					SUM(image_size * image_views) AS total_traffic,
 					SUM(image_views) AS total_views
 				FROM
-					' . IMAGES_TABLE;
+					site_images';
 			$this->db->query($sql);
 			$row = $this->db->fetchrow();
 			$this->db->freeresult();

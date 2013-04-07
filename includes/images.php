@@ -264,7 +264,7 @@ class images extends page
 				'image_size' => $file->get('filesize'),
 			];
 
-			$sql = 'INSERT INTO ' . IMAGES_TABLE . ' ' . $this->db->build_array('INSERT', $sql_ary);
+			$sql = 'INSERT INTO site_images ' . $this->db->build_array('INSERT', $sql_ary);
 			$this->db->query($sql);
 			$image_id = $this->db->insert_id();
 
@@ -326,7 +326,7 @@ class images extends page
 			SELECT
 				*
 			FROM
-				' . IMAGE_VIEWS_TABLE . '
+				site_image_views
 			ORDER BY
 				views_count DESC';
 		$this->db->query($sql);
@@ -342,7 +342,7 @@ class images extends page
 			SELECT
 				*
 			FROM
-				' . IMAGE_REFS_TABLE . '
+				site_image_refs
 			ORDER BY
 				ref_views DESC';
 		$this->db->query_limit($sql, 100);
@@ -373,9 +373,9 @@ class images extends page
 				u.user_url,
 				u.user_colour
 			FROM
-				' . IMAGES_TABLE . ' i
+				site_images i
 			LEFT JOIN
-				' . USERS_TABLE . ' u ON (u.user_id = i.user_id)
+				site_users u ON (u.user_id = i.user_id)
 			GROUP BY
 				i.user_id
 			ORDER BY

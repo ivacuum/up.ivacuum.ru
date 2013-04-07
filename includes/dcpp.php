@@ -27,7 +27,7 @@ class dcpp extends page
 			SELECT
 				COUNT(*) as total_dlc
 			FROM
-				' . DOWNLOADS_TABLE . '
+				site_downloads
 			WHERE
 				dl_time >= UNIX_TIMESTAMP(CURRENT_DATE())';
 		$result = $db->query($sql);
@@ -48,7 +48,7 @@ class dcpp extends page
 				SUM(file_size) AS total_size,
 				SUM(file_size * download_count) AS total_traffic
 			FROM
-				' . FILES_TABLE;
+				site_files';
 		$result = $db->query($sql);
 		$row = $db->fetchrow($result);
 		$db->freeresult($result);
@@ -98,7 +98,7 @@ class dcpp extends page
 				SELECT
 					' . $search_for . '
 				FROM
-					' . FILES_TABLE . '
+					site_files
 				WHERE
 					file_project = ' . $db->check_value('dc') . '
 				AND
@@ -167,7 +167,7 @@ class dcpp extends page
 					/**
 					* Заносим информацию о загруженном изображении в БД
 					*/
-					$sql = 'INSERT INTO ' . FILES_TABLE . ' ' . $db->build_array('INSERT', $sql_ary);
+					$sql = 'INSERT INTO site_files ' . $db->build_array('INSERT', $sql_ary);
 					$db->query($sql);
 
 					$template->setvar('LOGO', 'success');
