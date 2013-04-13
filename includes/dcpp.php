@@ -105,7 +105,7 @@ class dcpp extends page
 					' . $search_for . ' ' . $db->like_expression(htmlspecialchars_decode($term)) . '
 				ORDER BY
 					file_time DESC';
-			$result = $db->query_limit($sql, 10);
+			$result = $db->query_limit($sql, [], 10);
 			$output = '';
 
 			while( $row = $db->fetchrow($result) )

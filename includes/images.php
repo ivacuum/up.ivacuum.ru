@@ -345,7 +345,7 @@ class images extends page
 				site_image_refs
 			ORDER BY
 				ref_views DESC';
-		$this->db->query_limit($sql, 100);
+		$this->db->query_limit($sql, [], 100);
 
 		while ($row = $this->db->fetchrow())
 		{
@@ -380,7 +380,7 @@ class images extends page
 				i.user_id
 			ORDER BY
 				total_views DESC';
-		$this->db->query_limit($sql, 100, 0, 60);
+		$this->db->query_limit($sql, [], 100, 0, 60);
 
 		while ($row = $this->db->fetchrow())
 		{
