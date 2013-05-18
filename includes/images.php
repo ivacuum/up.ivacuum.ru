@@ -260,7 +260,7 @@ class images extends page
 				'user_id'    => $this->user['user_id'],
 				'image_url'  => $file->get('realname'),
 				'image_date' => date('ymd'),
-				'image_time' => $this->user->ctime,
+				'image_time' => $this->request->time,
 				'image_size' => $file->get('filesize'),
 			];
 
@@ -322,13 +322,7 @@ class images extends page
 	*/
 	public function referers()
 	{
-		$sql = '
-			SELECT
-				*
-			FROM
-				site_image_views
-			ORDER BY
-				views_count DESC';
+		$sql = 'SELECT * FROM site_image_views ORDER BY views_count DESC';
 		$this->db->query($sql);
 
 		while ($row = $this->db->fetchrow())
@@ -338,13 +332,7 @@ class images extends page
 
 		$this->db->freeresult();
 
-		$sql = '
-			SELECT
-				*
-			FROM
-				site_image_refs
-			ORDER BY
-				ref_views DESC';
+		$sql = 'SELECT * FROM site_image_refs ORDER BY ref_views DESC';
 		$this->db->query_limit($sql, [], 100);
 
 		while ($row = $this->db->fetchrow())

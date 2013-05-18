@@ -157,7 +157,7 @@ class dcpp extends page
 					$sql_ary = [
 						'file_project'   => 'dc',
 						'file_folder'    => 'clients',
-						'file_time'      => $user->ctime,
+						'file_time'      => $request->time,
 						'file_name'      => $file_name,
 						'file_url'       => $file_url,
 						'file_size'      => $file->filesize,
