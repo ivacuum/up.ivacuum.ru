@@ -5,7 +5,7 @@
 	<h2>{$page.page_title}</h2>
 </div>
 
-{if $upload_errors}
+{if not empty($upload_errors)}
 	<div class="alert-message" data-alert="alert">
 		<a class="close" href="#">&times;</a>
 		<p><strong>В процессе загрузки произошли ошибки.</strong> Не удалось загрузить файлов: {$FILES_NOT_UPLOADED}.</p>
