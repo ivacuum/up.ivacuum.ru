@@ -15,8 +15,7 @@ class service extends base_service
 	*/
 	public function obtain_image_stats()
 	{
-		if (false === $stats = $this->driver->get('image_stats'))
-		{
+		if (false === $stats = $this->driver->get('image_stats')) {
 			$stats = [];
 
 			/* Количество изображений, загруженных за последние сутки */

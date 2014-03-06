@@ -55,8 +55,7 @@ class images extends page
 		
 		// $this->config['gallery.images.upload_dir'] = '/srv/www/vhosts/static.ivacuum.ru/tmp/';
 
-		if (!is_dir("{$this->config['gallery.images.upload_dir']}{$date}/"))
-		{
+		if (!is_dir("{$this->config['gallery.images.upload_dir']}{$date}/")) {
 			/**
 			* Изображения храним по дням
 			* Если папки с текущей датой нету, то создаём её
@@ -66,16 +65,13 @@ class images extends page
 			mkdir("{$this->config['gallery.images.upload_dir']}{$date}/s/", 0777);
 		}
 
-		if (isset($_FILES['userfile']['name']) && sizeof($_FILES['userfile']['name']) > 10)
-		{
+		if (isset($_FILES['userfile']['name']) && sizeof($_FILES['userfile']['name']) > 10) {
 			trigger_error('Можно загружать не более 10 файлов за раз. Вы же выбрали ' . sizeof($_FILES['userfile']['name']) . '.');
 		}
 
 		/* Обработка мультизагрузки */
-		if (isset($_FILES['userfile']['name']) && is_array($_FILES['userfile']['name']))
-		{
-			for ($i = 0, $len = sizeof($_FILES['userfile']['name']); $i < $len; $i++)
-			{
+		if (isset($_FILES['userfile']['name']) && is_array($_FILES['userfile']['name'])) {
+			for ($i = 0, $len = sizeof($_FILES['userfile']['name']); $i < $len; $i++) {
 				$_FILES["userfile{$i}"]['name']     = $_FILES['userfile']['name'][$i];
 				$_FILES["userfile{$i}"]['type']     = $_FILES['userfile']['type'][$i];
 				$_FILES["userfile{$i}"]['tmp_name'] = $_FILES['userfile']['tmp_name'][$i];
@@ -87,34 +83,28 @@ class images extends page
 		}
 
 		/* Обработка мультизагрузки в опере */
-		if (isset($_POST['userfile'], $_POST['userfile'][0]))
-		{
-			if ($index = strpos($_POST['userfile'][0], "\n"))
-			{
+		if (isset($_POST['userfile'], $_POST['userfile'][0])) {
+			if ($index = strpos($_POST['userfile'][0], "\n")) {
 				$bound = substr($_POST['userfile'][0], 2, $index - 2);
 				$body  = "MIME-Version: 1.0\nContent-type: multipart/form-data; boundary={$bound}\n\n" . $_POST['userfile'][0];
 				unset($_POST['userfile'][0]);
 
 				$msg = mailparse_msg_create();
 
-				if (mailparse_msg_parse($msg, $body))
-				{
+				if (mailparse_msg_parse($msg, $body)) {
 					$i = 0;
 
-					foreach (mailparse_msg_get_structure($msg) as $st)
-					{
+					foreach (mailparse_msg_get_structure($msg) as $st) {
 						$section = mailparse_msg_get_part($msg, $st);
 						$data    = mailparse_msg_get_part_data($section);
 
-						if ($data['content-type'] == 'multipart/form-data')
-						{
+						if ($data['content-type'] == 'multipart/form-data') {
 							continue;
 						}
 
 						ob_start();
 
-						if (mailparse_msg_extract_part($section, $body))
-						{
+						if (mailparse_msg_extract_part($section, $body)) {
 							$tmp = tempnam(sys_get_temp_dir(), 'php');
 							file_put_contents($tmp, ob_get_clean());
 
@@ -125,9 +115,7 @@ class images extends page
 							$_FILES["userfile{$i}"]['size']     = filesize($tmp);
 
 							$i++;
-						}
-						else
-						{
+						} else {
 							ob_end_clean();
 						}
 					}
@@ -138,10 +126,8 @@ class images extends page
 			}
 		}
 
-		foreach ($_FILES as $files => $files_ary)
-		{
-			if ($files_ary['error'] != UPLOAD_ERR_OK)
-			{
+		foreach ($_FILES as $files => $files_ary) {
+			if ($files_ary['error'] != UPLOAD_ERR_OK) {
 				continue;
 			}
 			
@@ -150,13 +136,11 @@ class images extends page
 			$file->clean_filename('unique_ext', "{$this->user['user_id']}_");
 			$file->move_file($this->config['gallery.images.upload_dir'] . $date, false, false);
 
-			if (sizeof($file->error))
-			{
+			if (sizeof($file->error)) {
 				$file->trigger_error();
 				$files_not_uploaded++;
 				
-				if ($this->request->is_ajax)
-				{
+				if ($this->request->is_ajax) {
 					$json_ary[] = [
 						'errors'       => $file->error,
 						'errors_count' => sizeof($file->error),
@@ -171,15 +155,12 @@ class images extends page
 			$transform = new \fw\upload\imagetransform($file->get('destination_file'));
 			
 			/* Наложение водяного знака */
-			if ($watermark && $watermark_pos)
-			{
-				if (!$transform->set_watermark($watermark, $watermark_pos))
-				{
+			if ($watermark && $watermark_pos) {
+				if (!$transform->set_watermark($watermark, $watermark_pos)) {
 					$file->trigger_error($transform->error);
 					$files_not_uploaded++;
 
-					if ($this->request->is_ajax)
-					{
+					if ($this->request->is_ajax) {
 						$json_ary[] = [
 							'errors'       => $file->error,
 							'errors_count' => sizeof($file->error),
@@ -197,15 +178,12 @@ class images extends page
 			* Разрешаем загружать изображения вплоть до 6000х6000px,
 			* но затем уменьшаем до выбранного размера
 			*/
-			if ($resize_to > 0)
-			{
-				if (!$transform->make_thumbnail($resize_to, $file->get('destination_file')))
-				{
+			if ($resize_to > 0) {
+				if (!$transform->make_thumbnail($resize_to, $file->get('destination_file'))) {
 					$file->trigger_error($transform->error);
 					$files_not_uploaded++;
 
-					if ($this->request->is_ajax)
-					{
+					if ($this->request->is_ajax) {
 						$json_ary[] = [
 							'errors'       => $file->error,
 							'errors_count' => sizeof($file->error),
@@ -218,13 +196,11 @@ class images extends page
 			}
 
 			/* Создание миниатюры для сайта (150px в ширину) */
-			if (!$transform->make_thumbnail(150, sprintf('%s/t/%s', $file->get('destination_path'), $file->get('realname'))))
-			{
+			if (!$transform->make_thumbnail(150, sprintf('%s/t/%s', $file->get('destination_path'), $file->get('realname')))) {
 				$file->trigger_error($transform->error);
 				$files_not_uploaded++;
 
-				if ($this->request->is_ajax)
-				{
+				if ($this->request->is_ajax) {
 					$json_ary[] = [
 						'errors'       => $file->error,
 						'errors_count' => sizeof($file->error),
@@ -236,15 +212,12 @@ class images extends page
 			}
 
 			/* Создание пользовательской миниатюры (180px или 360px в ширину) */
-			if ($preview_size > 0)
-			{
-				if (!$transform->make_thumbnail($preview_size, sprintf('%s/s/%s', $file->get('destination_path'), $file->get('realname'))))
-				{
+			if ($preview_size > 0) {
+				if (!$transform->make_thumbnail($preview_size, sprintf('%s/s/%s', $file->get('destination_path'), $file->get('realname')))) {
 					$file->trigger_error($transform->error);
 					$files_not_uploaded++;
 
-					if ($this->request->is_ajax)
-					{
+					if ($this->request->is_ajax) {
 						$json_ary[] = [
 							'errors'       => $file->error,
 							'errors_count' => sizeof($file->error),
@@ -274,8 +247,7 @@ class images extends page
 				'REALNAME' => $file->get('realname'),
 			]);
 			
-			if ($this->request->is_ajax)
-			{
+			if ($this->request->is_ajax) {
 				$json_ary[] = [
 					'date'         => date('ymd'),
 					'errors'       => $file->error,
@@ -289,13 +261,11 @@ class images extends page
 			$files_uploaded++;
 		}
 
-		if ($files_uploaded == 0 && $files_not_uploaded == 0)
-		{
+		if ($files_uploaded == 0 && $files_not_uploaded == 0) {
 			trigger_error('Необходимо выбрать хотя бы один файл для загрузки.');
 		}
 		
-		if ($this->request->is_ajax)
-		{
+		if ($this->request->is_ajax) {
 			$this->template->assign('THUMB', $preview_size > 0);
 			
 			json_output([
@@ -325,8 +295,7 @@ class images extends page
 		$sql = 'SELECT * FROM site_image_views ORDER BY views_count DESC';
 		$this->db->query($sql);
 
-		while ($row = $this->db->fetchrow())
-		{
+		while ($row = $this->db->fetchrow()) {
 			$this->template->assign(mb_strtoupper($row['views_from']) . '_VIEWS', $row['views_count']);
 		}
 
@@ -335,8 +304,7 @@ class images extends page
 		$sql = 'SELECT * FROM site_image_refs ORDER BY ref_views DESC';
 		$this->db->query_limit($sql, [], 100);
 
-		while ($row = $this->db->fetchrow())
-		{
+		while ($row = $this->db->fetchrow()) {
 			$this->template->append('referers', [
 				'DOMAIN' => $row['ref_domain'],
 				'VIEWS'  => $row['ref_views'],
@@ -370,8 +338,7 @@ class images extends page
 				total_views DESC';
 		$this->db->query_limit($sql, [], 100, 0, 60);
 
-		while ($row = $this->db->fetchrow())
-		{
+		while ($row = $this->db->fetchrow()) {
 			$this->template->append('users', [
 				'IMAGES'  => $row['total_images'],
 				'PROFILE' => $row['username'],
